@@ -28,18 +28,6 @@ if command -v ccache >/dev/null 2>&1; then
 fi
 
 
-# Link with mold (a much faster linker) on Linux when available. ccache caches
-# compilation but never linking, so mold attacks the link phase that dominates
-# warm rebuilds. We use `mold -run`, which transparently redirects the linker the
-# compiler driver invokes - this is compiler-agnostic, so it works with GCC < 12
-# (which lacks -fuse-ld=mold) and with clang's -rtlib=compiler-rt. macOS keeps
-# Apple's ld and Windows keeps MSVC link.
-MOLD_RUN=""
-if [[ "$(uname)" == "Linux" ]] && command -v mold >/dev/null 2>&1; then
-    MOLD_RUN="mold -run"
-fi
-
-
 # Emit the build matrix for build.yml as a step output. On pull_request we run
 # only the representative "core" compiler set; on push (e.g. to main) we run the
 # full compiler sweep. Tiers are defined in build_matrix.json.
@@ -67,7 +55,6 @@ prepare_linux() {
         libxkbcommon-dev \
         libxrandr-dev \
         libxi-dev \
-        mold \
         ninja-build
 }
 
@@ -128,7 +115,7 @@ configure_mujoco() {
 
 build_mujoco() {
     echo "Building MuJoCo..."
-    ${MOLD_RUN} cmake --build . --config=Release ${CMAKE_BUILD_ARGS}
+    cmake --build . --config=Release ${CMAKE_BUILD_ARGS}
 }
 
 
@@ -191,7 +178,7 @@ configure_simulate() {
 
 build_simulate() {
     echo "Building simulate..."
-    ${MOLD_RUN} cmake --build . --config=Release ${CMAKE_BUILD_ARGS}
+    cmake --build . --config=Release ${CMAKE_BUILD_ARGS}
 }
 
 
@@ -217,7 +204,7 @@ configure_studio() {
 
 build_studio() {
     echo "Building Studio..."
-    ${MOLD_RUN} cmake --build build --config=Release --target mujoco_studio --parallel
+    cmake --build build --config=Release --target mujoco_studio --parallel
     echo "Building Studio... DONE"
 }
 
@@ -242,7 +229,7 @@ build_python_bindings() {
     MUJOCO_PATH="${TMPDIR}/mujoco_install" \
     MUJOCO_PLUGIN_PATH="${TMPDIR}/mujoco_install/mujoco_plugin" \
     MUJOCO_CMAKE_ARGS="-DCMAKE_INTERPROCEDURAL_OPTIMIZATION:BOOL=OFF ${CCACHE_ARGS} ${CMAKE_ARGS}" \
-    ${MOLD_RUN} pip wheel -v --no-deps mujoco-*.tar.gz
+    pip wheel -v --no-deps mujoco-*.tar.gz
 }
 
 
