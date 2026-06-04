@@ -231,7 +231,14 @@ make_python_sdist() {
 
 build_python_bindings() {
     echo "Building Python bindings..."
-    source ${TMPDIR}/venv/bin/activate &&
+    source ${TMPDIR}/venv/bin/activate
+    # pip unpacks the sdist into a randomized temp dir every run, so the absolute
+    # source/include paths differ each time and defeat ccache (0% hit, full
+    # recompile). CCACHE_BASEDIR rewrites absolute paths under it to paths relative
+    # to the (also-in-temp) build cwd, cancelling the random component so objects
+    # hash identically across runs. CCACHE_SLOPPINESS ignores timestamp/path noise.
+    export CCACHE_BASEDIR="${TMPDIR}"
+    export CCACHE_SLOPPINESS="time_macros,include_file_mtime,include_file_ctime,pch_defines,locale,system_headers"
     MUJOCO_PATH="${TMPDIR}/mujoco_install" \
     MUJOCO_PLUGIN_PATH="${TMPDIR}/mujoco_install/mujoco_plugin" \
     MUJOCO_CMAKE_ARGS="-DCMAKE_INTERPROCEDURAL_OPTIMIZATION:BOOL=OFF ${CCACHE_ARGS} ${CMAKE_ARGS}" \
