@@ -35,6 +35,12 @@ on:
       - "doc/**"
       - "**/README.md"
 
+# Limit the default GITHUB_TOKEN to read-only. No job here writes via the token:
+# checkout reads the repo; ccache/cache and upload-artifact use their own backend
+# tokens; the chat notification uses a secret webhook.
+permissions:
+  contents: read
+
 jobs:
   # Compute the build matrix based on the event: PRs get the "core" representative
   # compiler set, pushes to main get the full sweep.
