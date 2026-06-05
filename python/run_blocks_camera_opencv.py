@@ -160,8 +160,7 @@ while not glfw.window_should_close(window):
         break;
 
     # get framebuffer viewport
-    viewport_width, viewport_height = glfw.get_framebuffer_size(
-        window)
+    viewport_width, viewport_height = glfw.get_framebuffer_size(window)
     viewport = mj.MjrRect(0, 0, viewport_width, viewport_height)
 
     #print camera configuration (help to initialize the view)
@@ -172,7 +171,7 @@ while not glfw.window_should_close(window):
     # Update scene and render
     mj.mjv_updateScene(model, data, opt, None, cam,
                        mj.mjtCatBit.mjCAT_ALL.value, scene)
-    # mj.mjr_render(viewport, scene, context)
+    mj.mjr_render(viewport, scene, context)
 
     #Code taken from https://github.com/dtorre38/mujoco_opencv
     # ******** inset view (code start) *********
@@ -199,7 +198,7 @@ while not glfw.window_should_close(window):
     mj.mjv_updateScene(model, data, opt, None, offscreen_cam, mj.mjtCatBit.mjCAT_ALL.value, scene)
 
     # 4. Render the scene in the offscreen buffer with mjr_render.
-    # mj.mjr_render(offscreen_viewport, scene, context)
+    mj.mjr_render(offscreen_viewport, scene, context)
 
     # ******** inset view (code end) *********
 
