@@ -172,7 +172,7 @@ while not glfw.window_should_close(window):
     # Update scene and render
     mj.mjv_updateScene(model, data, opt, None, cam,
                        mj.mjtCatBit.mjCAT_ALL.value, scene)
-    mj.mjr_render(viewport, scene, context)
+    # mj.mjr_render(viewport, scene, context)
 
     #Code taken from https://github.com/dtorre38/mujoco_opencv
     # ******** inset view (code start) *********
@@ -199,7 +199,7 @@ while not glfw.window_should_close(window):
     mj.mjv_updateScene(model, data, opt, None, offscreen_cam, mj.mjtCatBit.mjCAT_ALL.value, scene)
 
     # 4. Render the scene in the offscreen buffer with mjr_render.
-    mj.mjr_render(offscreen_viewport, scene, context)
+    # mj.mjr_render(offscreen_viewport, scene, context)
 
     # ******** inset view (code end) *********
 
@@ -223,6 +223,14 @@ while not glfw.window_should_close(window):
 
     # Convert bw_pixels to an image format OpenCV can use (BGR format)
     bw_image_bgr = cv2.cvtColor(bw_pixels_flipped, cv2.COLOR_RGB2BGR)
+
+    # Save the grayscale image to disk (optional)
+    # cv2.imwrite("./images/depth/grayscale_image_" + str(data.time) + ".png", bw_image_bgr)
+    cv2.imwrite("./images/depth/grayscale_image.png", bw_image_bgr)
+
+    # Save the color image to disk (optional)
+    # cv2.imwrite("./images/color/color_image_" + str(data.time) + ".png", rgb_pixels)
+    cv2.imwrite("./images/color/color_image.png", rgb_pixels)
 
     # Show the grayscale image in the inset location (in OpenCV window)
     cv2.imshow("Black and White Image", bw_image_bgr)
